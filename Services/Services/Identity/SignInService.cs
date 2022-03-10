@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Services.Services.Identity
 {
@@ -14,7 +15,7 @@ namespace Services.Services.Identity
     {
         public bool IsSignedIn(ClaimsPrincipal principal)
         {
-            throw new NotImplementedException();
+            return principal.Claims.Count() > 0;
         }
 
         public Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)

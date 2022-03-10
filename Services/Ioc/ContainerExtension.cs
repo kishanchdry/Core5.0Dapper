@@ -19,11 +19,11 @@ namespace Services.Ioc
         public static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.RegisterRepositories(configuration);
-            services.AddSingleton<IUserService, UserService>();
-            services.AddSingleton<IRoleService, RoleService>();
-            services.AddSingleton<ISignInService, SignInService>();
-            services.AddSingleton<IExceptionLogginService, ExceptionLogginService>();
-            //builder.RegisterType(typeof(IGenericService<>), typeof(GenericService<>));
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<ISignInService, SignInService>();
+            services.AddScoped<IExceptionLogginService, ExceptionLogginService>();
+            services.AddScoped<ICURDService, CURDService>();
         }
     }
 }

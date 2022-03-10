@@ -60,6 +60,8 @@ namespace Web
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.RegisterWeb(Configuration);
+
             services.AddAutoMapper(typeof(MappingProfiles));
             services.AddControllers();
 
@@ -107,7 +109,7 @@ namespace Web
             //    AddEntityFrameworkStores<AppIdentityContext>().
             //    AddDefaultTokenProviders();
 
-            services.AddScoped(typeof(IHttpContextAccessor), typeof(HttpContextAccessor));
+            
             services.AddAuthentication()
                 .AddGoogle(option =>
                 {
@@ -192,8 +194,6 @@ namespace Web
 
             services.AddControllersWithViews();
             services.AddRazorPages();
-            services.AddServices();
-            services.RegisterWeb(Configuration);
             #region Runtime allow page editing 
             IMvcBuilder builder = services.AddRazorPages();
 #if DEBUG

@@ -22,10 +22,13 @@ namespace Data.Ioc
             var DBConnectionString = configuration.GetConnectionString("DefaultConnection");
             if (string.IsNullOrEmpty(DBConnectionString)) throw new Exception("Empty Database connection string");
 
-            services.AddSingleton(typeof(IRepositoryConfiguration),ctx => new RepositoryConfiguration(DBConnectionString));
+            services.AddScoped(typeof(IRepositoryConfiguration),ctx => new RepositoryConfiguration(DBConnectionString));
 
-            services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
-            services.AddSingleton<IUserRepository, UserRepository>();
+            services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddScoped(typeof(IGenericDataRepository<>), typeof(GenericDataRepository<>));
+            services.AddScoped(typeof(GenericDataRepository<>), typeof(GenericDataRepository<>));
             //builder.RegisterType<IGenericDataRepository<>, GenericDataRepository<>>();
         }
     }

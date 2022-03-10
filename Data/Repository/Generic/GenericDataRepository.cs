@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 
 namespace Data.Repository.GenericRepository
 {
-    public class GenericDataRepository<T> : IGenericDataRepository<T>, IDisposable where T : BaseEntity
+    public class GenericDataRepository<T> : IGenericDataRepository<T>, IDisposable where T : class
     {
         public GenericDataRepository()
         {
