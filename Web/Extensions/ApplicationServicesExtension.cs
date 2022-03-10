@@ -1,8 +1,6 @@
 ﻿using Web.Authorization.Policies;
 using Communication.Mail;
 using Communication.Utilities;
-using Data.Context;
-using Data.Context.Identity;
 using Data.IRepository;
 using Data.Repository.GenericRepository;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Data.IRepository.IGeneric;
 
 namespace Web.Extensions
 {
@@ -31,16 +30,10 @@ namespace Web.Extensions
         /// <returns></returns>
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddTransient<DataContext, DataContext>();
-            services.AddTransient<AppIdentityContext, AppIdentityContext>();
-            
             services.AddTransient(typeof(IGenericDataRepository<>), typeof(GenericDataRepository<>));
             services.AddTransient(typeof(GenericDataRepository<>), typeof(GenericDataRepository<>));
 
             services.AddScoped<SaveFormFileSerivce, SaveFormFileSerivce>();
-            services.AddScoped<SendOTPService, SendOTPService>();
-            services.AddScoped<IManageService, ManageService>();
-            services.AddScoped<IRoleActionsService, RoleActionsService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISignInService, SignInService>();
             services.AddScoped<IRoleService, RoleService>();

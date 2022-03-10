@@ -6,23 +6,27 @@ using System.Threading.Tasks;
 using Autofac;
 using Data.Factory;
 using Data.IFactory;
+using Data.IRepository;
+using Data.IRepository.IGeneric;
+using Data.Repository;
+using Data.Repository.GenericRepository;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Data.Ioc
 {
     public static class ContainerExtension
     {
-        public static void RegisterRepositories(this ContainerBuilder builder, IConfiguration configuration)
+        public static void RegisterRepositories(this IServiceCollection services, IConfiguration configuration)
         {
             var DBConnectionString = configuration.GetConnectionString("DefaultConnection");
             if (string.IsNullOrEmpty(DBConnectionString)) throw new Exception("Empty Database connection string");
 
-            builder.Register(ctx => new RepositoryConfiguration(DBConnectionString))
-                .As<IRepositoryConfiguration>()
-                .SingleInstance();
+            services.AddSingleton(typeof(IRepositoryConfiguration),ctx => new RepositoryConfiguration(DBConnectionString));
 
-            builder.RegisterType<DbConnectionFactory>().As<IDbConnectionFactory>().InstancePerLifetimeScope();
-            //builder.RegisterType<StudentRepository>().As<IStudentRepository>().InstancePerLifetimeScope();
+            services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+            services.AddSingleton<IUserRepository, UserRepository>();
+            //builder.RegisterType<IGenericDataRepository<>, GenericDataRepository<>>();
         }
     }
 }

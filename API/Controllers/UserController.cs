@@ -18,7 +18,6 @@ using Shared.Models.API;
 using Shared.Models.Base;
 using Shared.Common.Enums;
 using API.Authorization.JWT;
-using Data.Entities.Identity;
 using Services.Services;
 using Shared.Common;
 

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Data.IRepository;
+using Data.IRepository.IGeneric;
 using Data.Repository.GenericRepository;
 using Services.IServices;
 using System;

@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Data.Context;
-using Data.Context.Identity;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,37 +32,12 @@ namespace Web
             //CreateHostBuilder(args).Build().Run();
 
             var host = CreateHostBuilder(args).Build();
-            
+
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-
-               //r factory = new LoggerFactory();
-                //var logger = loggerFactory.CreateLogger("MyLog");
-                //loggerFactory.AddProvider();
-
-
                 ExceptionLoggerExtentionMetod.service = services.GetRequiredService<IExceptionLogginService>();
-
-                try
-                {
-                    var context = services.GetRequiredService<DataContext>();
-                    await context.Database.MigrateAsync();
-                    await DataContextSeed.SeedAsync(context);
-
-                    //migrate indentity database
-                    var identityContext = services.GetRequiredService<AppIdentityContext>();
-                    await identityContext.Database.MigrateAsync();
-                    //import seed identity data
-                    await AppIdentityContextSeed.SeedAsync(services, identityContext);
-
-                }
-                catch (Exception ex)
-                {
-                    var logger = loggerFactory.CreateLogger<Program>();
-                    logger.LogError($"An error occurred during migration: {ex.Message}");
-                }
             }
             host.Run();
         }

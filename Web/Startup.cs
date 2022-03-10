@@ -3,22 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Data.Context.Identity;
-using Data.Entities.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Web.Authorization.Policies;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using Data.Context;
 using Web.Extensions;
 using Web.Helper;
 using AutoMapper;
@@ -32,6 +26,8 @@ using Newtonsoft.Json.Serialization;
 using Shared.Models.API;
 using Shared.Common;
 using Microsoft.AspNetCore.DataProtection;
+using Autofac;
+using Web.Ioc;
 
 namespace Web
 {
@@ -70,47 +66,48 @@ namespace Web
             services.Configure<JwtTokenSettings>(Configuration.GetSection("JwtTokenSettings"));//for jwt token
             services.Configure<ConfigurationKeys>(Configuration.GetSection("ConfigurationKeys"));//for configuration keys
 
-         
+
 
             #region Contexes
-            services.AddDbContext<DataContext>(config =>
-                {
-                    config.UseSqlServer(Configuration.GetConnectionString("IdentityConection"));
-                });
+            //services.AddDbContext<DataContext>(config =>
+            //    {
+            //        config.UseSqlServer(Configuration.GetConnectionString("IdentityConection"));
+            //    });
 
-            services.AddDbContext<AppIdentityContext>(config =>
-            {
-                config.UseSqlServer(Configuration.GetConnectionString("IdentityConection"));
-            });
+            //services.AddDbContext<AppIdentityContext>(config =>
+            //{
+            //    config.UseSqlServer(Configuration.GetConnectionString("IdentityConection"));
+            //});
 
-            services.AddDataProtection().PersistKeysToDbContext<AppIdentityContext>().SetApplicationName("App");
+            //services.AddDataProtection().PersistKeysToDbContext<AppIdentityContext>().SetApplicationName("App");
 
             #endregion
 
             #region Identity
             //AddIdentity register the services
-            services.AddIdentity<User, Role>(options =>
-            {
-                // Password settings.
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 6;
-                options.Password.RequiredUniqueChars = 2;
+            //services.AddIdentity<User, Role>(options =>
+            //{
+            //    // Password settings.
+            //    options.Password.RequireDigit = false;
+            //    options.Password.RequireLowercase = false;
+            //    options.Password.RequireNonAlphanumeric = false;
+            //    options.Password.RequireUppercase = false;
+            //    options.Password.RequiredLength = 6;
+            //    options.Password.RequiredUniqueChars = 2;
 
-                // Lockout settings.
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.AllowedForNewUsers = true;
+            //    // Lockout settings.
+            //    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+            //    options.Lockout.MaxFailedAccessAttempts = 5;
+            //    options.Lockout.AllowedForNewUsers = true;
 
-                // User settings.
-                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                options.User.RequireUniqueEmail = true;
-            }).
-                AddEntityFrameworkStores<AppIdentityContext>().
-                AddDefaultTokenProviders();
+            //    // User settings.
+            //    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+            //    options.User.RequireUniqueEmail = true;
+            //}).
+            //    AddEntityFrameworkStores<AppIdentityContext>().
+            //    AddDefaultTokenProviders();
 
+            services.AddScoped(typeof(IHttpContextAccessor), typeof(HttpContextAccessor));
             services.AddAuthentication()
                 .AddGoogle(option =>
                 {
@@ -196,7 +193,7 @@ namespace Web
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddServices();
-
+            services.RegisterWeb(Configuration);
             #region Runtime allow page editing 
             IMvcBuilder builder = services.AddRazorPages();
 #if DEBUG
@@ -204,10 +201,10 @@ namespace Web
             {
                 builder.AddRazorRuntimeCompilation();
             }
-#endif 
+#endif
             #endregion
 
-   
+
 
         }
 
@@ -218,7 +215,7 @@ namespace Web
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -262,7 +259,7 @@ namespace Web
 
             app.UseAuthorization();
 
-           
+
 
             #region Routing
             app.UseEndpoints(endpoints =>
@@ -280,7 +277,7 @@ namespace Web
                             "admin",
                             "{area=admin}/{controller=Home}/{action=Index}/{id?}");
 
-                    
+
                 });
             #endregion
         }

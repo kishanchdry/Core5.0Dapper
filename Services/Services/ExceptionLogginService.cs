@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Data.Entities;
 using Data.IRepository;
+using Data.IRepository.IGeneric;
 using Data.Repository.GenericRepository;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -24,14 +24,14 @@ namespace Services.Services
         //private static readonly Lazy<ExceptionLogginService> lazy = new Lazy<ExceptionLogginService>(() => new ExceptionLogginService());
         //public static ExceptionLogginService Instance => lazy.Value;
 
-        protected readonly IGenericDataRepository<ExceptionEntity> repository;
+        protected readonly IGenericDataRepository<ExceptionModel> repository;
         protected readonly IMapper mapper;
 
         public ExceptionLogginService(IServiceProvider serviceProvider)
         {
             using (var scope = serviceProvider.CreateScope()) // this will use `IServiceScopeFactory` internally
             {
-                repository = scope.ServiceProvider.GetService<IGenericDataRepository<ExceptionEntity>>();
+                repository = scope.ServiceProvider.GetService<IGenericDataRepository<ExceptionModel>>();
                 mapper = scope.ServiceProvider.GetService<IMapper>();
             }
 
@@ -53,7 +53,7 @@ namespace Services.Services
 
                 if (model != null)
                 {
-                    var entity = mapper.Map<ExceptionEntity>(model);
+                    var entity = mapper.Map<ExceptionModel>(model);
                     repository.Add(entity);
                 }
                 return true;
@@ -107,7 +107,7 @@ namespace Services.Services
 
                 if (model != null)
                 {
-                    ExceptionEntity exe = new ExceptionEntity();
+                    ExceptionModel exe = new ExceptionModel();
                     exe.CreatedDate = DateTime.UtcNow.GetLocal();
                     exe.ModifiedDate = DateTime.UtcNow.GetLocal();
                     exe.IsActive = true;

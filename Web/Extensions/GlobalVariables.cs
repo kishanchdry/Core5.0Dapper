@@ -1,5 +1,4 @@
-﻿using Data.Entities.Identity;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Services.IServices.Identity;
 using System;
@@ -20,7 +19,7 @@ namespace Web.Extensions
         /// <param name="userManager">User manager</param>
         /// <param name="httpContext">http context</param>
         /// <returns></returns>
-        public async static Task<string> GetLoggedInUserId(this IUserService userManager, HttpContext httpContext)
+        public async static Task<long> GetLoggedInUserId(this IUserService userManager, HttpContext httpContext)
         {
             var user = await userManager.GetUserAsync(httpContext.User);
             return user.Id;
@@ -35,7 +34,7 @@ namespace Web.Extensions
         public async static Task<string> GetLoggedInUserName(this IUserService userManager, HttpContext httpContext)
         {
             var user = await userManager.GetUserAsync(httpContext.User);
-            return user.UserName;
+            return user.Email;
         }
     }
 }

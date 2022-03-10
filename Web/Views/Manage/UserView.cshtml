@@ -27,17 +27,6 @@
 
 
     <div class="row">
-        <span class="col-md-4 Bold  title">Phone Number: </span>
-        <span class="col-md-8 detail value">
-            @string.Format("{0}", Model?.PhoneNumber)
-            <span>
-                @if (Model?.PhoneNumberConfirmed == false)
-                {<a href="#" class="verify-mobile verify" id="@Model?.Id">Verify</a>}
-            </span>
-        </span>
-    </div>
-
-    <div class="row">
         <span class="col-md-4 Bold title">Active: </span>
         <span class="col-md-8 detail value">
             @if (Model?.IsActive == true)

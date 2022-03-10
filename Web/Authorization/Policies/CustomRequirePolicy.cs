@@ -1,5 +1,4 @@
-﻿using Data.Entities.Identity;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Services.Generic;
 using Services.IServices.Identity;
@@ -33,19 +32,16 @@ namespace Web.Authorization.Policies
     public class CustomRequirePolicyHandler : AuthorizationHandler<CustomRequirePolicy>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IRoleActionsService _roleActionsService;
         private readonly IUserService _userManager;
 
         /// <summary>
         /// construct srvices
         /// </summary>
         /// <param name="httpContextAccessor"></param>
-        /// <param name="roleActionsService"></param>
         /// <param name="userManager"></param>
-        public CustomRequirePolicyHandler(IHttpContextAccessor httpContextAccessor, IRoleActionsService roleActionsService, IUserService userManager)
+        public CustomRequirePolicyHandler(IHttpContextAccessor httpContextAccessor, IUserService userManager)
         {
             _httpContextAccessor = httpContextAccessor;
-            _roleActionsService = roleActionsService;
             _userManager = userManager;
         }
 
@@ -57,34 +53,35 @@ namespace Web.Authorization.Policies
         /// <returns></returns>
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, CustomRequirePolicy requirement)
         {
-            List<string> s = new List<string>() { "_EditUser" };
-            connectedAction.Add("EditUser", s);
+            //List<string> s = new List<string>() { "_EditUser" };
+            //connectedAction.Add("EditUser", s);
 
-            var actions = CacheService.GetOrSet<RoleAction>(ApplicationConstants.CacheRoleActionsKey, _roleActionsService.GetAll);
-            var userRoles = CacheService.GetOrSet<UserRole>(ApplicationConstants.CacheUserRoleKey, _roleActionsService.GetAllUserRole);
+            //var actions = CacheService.GetOrSet<RoleAction>(ApplicationConstants.CacheRoleActionsKey, _roleActionsService.GetAll);
+            //var userRoles = CacheService.GetOrSet<UserRole>(ApplicationConstants.CacheUserRoleKey, _roleActionsService.GetAllUserRole);
 
-            var userId = _userManager.GetUserId(context.User);
+            //var userId = _userManager.GetUserId(context.User);
 
-            bool hasAccess = false;
-            var values = _httpContextAccessor.HttpContext.Request.RouteValues;
-            string controllerName = values["controller"].ToString();
-            string actionName = values["action"].ToString();
+            //bool hasAccess = false;
+            //var values = _httpContextAccessor.HttpContext.Request.RouteValues;
+            //string controllerName = values["controller"].ToString();
+            //string actionName = values["action"].ToString();
 
-            if (connectedAction.Any(e => e.Value.Contains(actionName)))
-            {
-                var roleReuired = connectedAction.First(e => e.Value.Contains(actionName));
-                actionName = roleReuired.Key;
-            }
+            //if (connectedAction.Any(e => e.Value.Contains(actionName)))
+            //{
+            //    var roleReuired = connectedAction.First(e => e.Value.Contains(actionName));
+            //    actionName = roleReuired.Key;
+            //}
 
-            if (actions.Any(e => userRoles.Any(x => x.UserId == userId && e.RoleId == x.RoleId) && (e.Controller == controllerName || e.Action == string.Format("{0}Controller/{1}", controllerName, actionName))))
-            {
-                hasAccess = true;
-            }
+            //if (actions.Any(e => userRoles.Any(x => x.UserId == userId && e.RoleId == x.RoleId) && (e.Controller == controllerName || e.Action == string.Format("{0}Controller/{1}", controllerName, actionName))))
+            //{
+            //    hasAccess = true;
+            //}
 
-            if (hasAccess)
-            {
-                context.Succeed(requirement);
-            }
+            //if (hasAccess)
+            //{
+            //    context.Succeed(requirement);
+            //}
+            context.Succeed(requirement);
             return Task.CompletedTask;
         }
 

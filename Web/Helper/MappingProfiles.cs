@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Data.Entities;
-using Data.Entities.Identity;
 using Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -27,8 +25,6 @@ namespace Web.Helper
             //cfg.CreateMap<Order, OrderEntity>().ForMember(dest => dest.OrderStatus, opt => opt.MapFrom<CustomResolver, string>(src => src.OrderStatus)); ;
             //cfg.CreateMap<OrderEntity, Order>().ForMember(dest => dest.OrderStatus, opt => opt.MapFrom<CustomResolver, int>(src => src.OrderStatus)); ;
             //ForMember(e => e.CategoryId, x => x.MapFrom(r => r.ProductCategoryId));
-            CreateMap<ExceptionModel, ExceptionEntity>().ReverseMap();
-            CreateMap<UserModel, User>().ReverseMap();
         }
     }
 

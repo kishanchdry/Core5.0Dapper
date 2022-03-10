@@ -1,5 +1,4 @@
 ﻿using Web.Models.Account;
-using Data.Entities.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +13,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Shared.Models.API;
 using Services.Services;
+using Shared.Models.Identity;
 
 namespace Web.Controllers.Base
 {
@@ -50,7 +50,6 @@ namespace Web.Controllers.Base
             LoginViewModel model = new LoginViewModel()
             {
                 ReturnUrl = returnUrl,
-                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
             };
             return View(model);
         }
@@ -76,12 +75,6 @@ namespace Web.Controllers.Base
                     //return RedirectToAction("Login", loginViewModel);
                 }
 
-                if (user.LockoutEnd != null)
-                {
-                    ModelState.AddModelError(string.Empty, "User temporary locked");
-                    //return RedirectToAction("Login", loginViewModel);
-                }
-
                 var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, loginViewModel.RememberMe, ApplicationConstants.LockoutOnFailure);
 
                 if (result.Succeeded)
@@ -93,20 +86,20 @@ namespace Web.Controllers.Base
                     }
 
 
-                    if (await _userManager.IsInRoleAsync(user, "Guest"))
+                    if (await _userManager.IsInRoleAsync(user.Id, "Guest"))
                     {
                         return RedirectToAction("Index", "Home", new { area = "" });
                     }
-                    if (await _userManager.IsInRoleAsync(user, "User"))
+                    if (await _userManager.IsInRoleAsync(user.Id, "User"))
                     {
                         return RedirectToAction("Index", "Home", new { area = "" });
                     }
-                    if (await _userManager.IsInRoleAsync(user, "Manager"))
+                    if (await _userManager.IsInRoleAsync(user.Id, "Manager"))
                     {
                         return RedirectToAction("Index", "Home", new { Area = "Admin" });
                         //return Redirect("~/Admin/Home/Index");
                     }
-                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    if (await _userManager.IsInRoleAsync(user.Id, "Admin"))
                     {
                         return RedirectToAction("Index", "Home", new { Area = "Admin" });
                         //return Redirect("~/Admin/Home/Index");
@@ -121,8 +114,6 @@ namespace Web.Controllers.Base
             {
                 loginViewModel = new LoginViewModel();
             }
-
-            loginViewModel.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             return View("Login", loginViewModel);
         }
@@ -214,95 +205,6 @@ namespace Web.Controllers.Base
 
         #endregion
 
-        #region External logins
-
-        /// <summary>
-        /// External login for facebook
-        /// </summary>
-        /// <param name="provider"></param>
-        /// <param name="returnUrl"></param>
-        /// <returns></returns>
-        [AllowAnonymous]
-        [HttpPost]
-        public ActionResult ExternalLogin(string provider, string returnUrl)
-        {
-            var reduredUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
-
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, reduredUrl);
-
-            return new ChallengeResult(provider, properties);
-        }
-
-        /// <summary>
-        /// External login call back
-        /// </summary>
-        /// <param name="returnUrl"></param>
-        /// <param name="remoteError"></param>
-        /// <returns></returns>
-        [AllowAnonymous]
-        public async Task<ActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
-        {
-            returnUrl = returnUrl ?? Url.Action("Index", "Home");
-
-            LoginViewModel loginViewModel = new LoginViewModel()
-            {
-                ReturnUrl = returnUrl,
-                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
-            };
-
-            if (remoteError != null)
-            {
-                ModelState.AddModelError(string.Empty, string.Format("Error from External provider {0}", remoteError));
-
-                return View("Login", loginViewModel);
-            }
-
-            var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-            {
-                ModelState.AddModelError(string.Empty, string.Format("Error loading external login information"));
-
-                return View("Login", loginViewModel);
-            }
-
-            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
-
-            if (signInResult.Succeeded)
-            {
-                return LocalRedirect(returnUrl);
-            }
-            else
-            {
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-
-                if (email != null)
-                {
-                    var user = await _userManager.FindByEmailAsync(email);
-
-                    if (user == null)
-                    {
-                        user = new User()
-                        {
-                            Email = info.Principal.FindFirstValue(ClaimTypes.Email),
-                            UserName = info.Principal.FindFirstValue(ClaimTypes.Email)
-                        };
-                        await _userManager.CreateAsync(user);
-                    }
-                    await _userManager.AddLoginAsync(user, info);
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-
-                    return LocalRedirect(returnUrl);
-                }
-
-                ViewBag.ErrorTitle = string.Format("Email claim not recived from {0}", info.LoginProvider);
-                ViewBag.ErrorMessage = string.Format("Please contact on support.");
-
-                return View("Error");
-            }
-        }
-
-        #endregion
-
         #region Reset password
         /// <summary>
         /// Reset Password
@@ -358,25 +260,20 @@ namespace Web.Controllers.Base
 
                 if (user != null)
                 {
-                    bool isPassCorrect = (await _userManager.CheckPasswordAsync(user, model.Password));
+                    bool isPassCorrect = (await _userManager.CheckPasswordAsync(user.Id, model.Password));
                     if (isPassCorrect == false)
                     {
-                        var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+                        var result = await _userManager.ResetPasswordAsync(user.Id, model.Token, model.Password);
 
                         if (result.Succeeded)
                         {
-                            if (await _userManager.IsLockedOutAsync(user))
-                            {
-                                await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
-                            }
-
-                            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                            var token = await _userManager.GeneratePasswordResetTokenAsync(user.Id);
                             await _userManager.SaveToken(user.Id, "", true);
                             return View();
                         }
                         else
                         {
-                            ModelState.AddModelError("message", result.Errors.FirstOrDefault().Description);
+                            ModelState.AddModelError("message", result.Errors.FirstOrDefault());
                             return View(model);
                         }
                     }
