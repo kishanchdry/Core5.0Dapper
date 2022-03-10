@@ -224,6 +224,34 @@ namespace Data.Repository.GenericRepository
             return status;
         }
 
+        public T GetSignleRawSP(string name, object param)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            return connection.QueryFirstOrDefault<T>(name, param, commandType: CommandType.StoredProcedure);
+
+        }
+
+        public async Task<T> GetSignleRawSPAsync(string name, object param)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            return await connection.QueryFirstOrDefaultAsync<T>(name, param, commandType: CommandType.StoredProcedure);
+
+        }
+
+
+        public IEnumerable<T> GetMultipleRawSP(string name, object param)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            return connection.Query<T>(name, param, commandType: CommandType.StoredProcedure);
+
+        }
+
+        public async Task<IEnumerable<T>> GetMultipleRawSPAsync(string name, object param)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            return await connection.QueryAsync<T>(name, param, commandType: CommandType.StoredProcedure);
+
+        }
         #endregion
     }
 
