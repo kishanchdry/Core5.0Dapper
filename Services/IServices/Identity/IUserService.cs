@@ -17,7 +17,6 @@ namespace Services.IServices.Identity
         Task<CustomIdentityResult> ChangePasswordAsync(long user, string currentPassword, string newPassword);
         Task<bool> CheckPasswordAsync(long user, string password);
         Task<CustomIdentityResult> CreateAsync(User user);
-        Task<CustomIdentityResult> CreateAsync(User user, string password);
         bool Equals(object obj);
         Task<User> FindByEmailAsync(string email);
         Task<User> FindByIdAsync(string userId);

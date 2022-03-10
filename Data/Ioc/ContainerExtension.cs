@@ -28,7 +28,7 @@ namespace Data.Ioc
             services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddScoped(typeof(IGenericDataRepository<>), typeof(GenericDataRepository<>));
-            services.AddScoped(typeof(GenericDataRepository<>), typeof(GenericDataRepository<>));
+            //services.AddScoped(typeof(GenericDataRepository<>), typeof(GenericDataRepository<>));
             //builder.RegisterType<IGenericDataRepository<>, GenericDataRepository<>>();
         }
     }

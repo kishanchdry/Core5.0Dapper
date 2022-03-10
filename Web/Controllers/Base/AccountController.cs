@@ -75,7 +75,7 @@ namespace Web.Controllers.Base
                     //return RedirectToAction("Login", loginViewModel);
                 }
 
-                var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, loginViewModel.RememberMe, ApplicationConstants.LockoutOnFailure);
+                var result = await _signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.RememberMe, ApplicationConstants.LockoutOnFailure);
 
                 if (result.Succeeded)
                 {
@@ -141,18 +141,19 @@ namespace Web.Controllers.Base
             {
                 UserName = registerViewModel.UserName,
                 Email = registerViewModel.Email,
-                FirstName = registerViewModel.Name
-                //FirstName = registerViewModel.FirstName,
-                //LastName = registerViewModel.LastName,
-                //PhoneNumber = registerViewModel.PhoneNumber,
-                //TwoFactorEnabled = registerViewModel.TwoFactorEnabled,
+                FirstName = registerViewModel.Name,
+                PasswordHash= registerViewModel.Password
+                FirstName = registerViewModel.FirstName,
+                LastName = registerViewModel.LastName,
+                PhoneNumber = registerViewModel.PhoneNumber,
+                TwoFactorEnabled = registerViewModel.TwoFactorEnabled,
             };
             //TODO handle error where register or add user but not expand that before insert
-            var result = await _userManager.CreateAsync(user, registerViewModel.Password);
+            var result = await _userManager.CreateAsync(user);
 
             if (result != null && result.Succeeded)
             {
-                var userResult = await _signInManager.PasswordSignInAsync(user, registerViewModel.Password, false, false);
+                var userResult = await _signInManager.PasswordSignInAsync(user.Email, registerViewModel.Password, false, false);
 
                 if (userResult.Succeeded)
                 {

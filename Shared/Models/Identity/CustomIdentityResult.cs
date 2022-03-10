@@ -10,6 +10,6 @@ namespace Shared.Models.Identity
     {
         public bool Succeeded { get; set; }
         public List<string> Errors { get; }
-        public string Message { get; }
+        public string Message { get; set; }
     }
 }

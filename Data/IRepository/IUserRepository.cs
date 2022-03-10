@@ -13,5 +13,6 @@ namespace Data.IRepository
         Task<CustomIdentityResult> AddToRolesAsync(long userId, string[] roles);
         Task<CustomIdentityResult> ChangePasswordAsync(long userId, string currentPassword, string newPassword);
         Task<bool> CheckPasswordAsync(long userId, string password);
+        Task<SignInResult> PasswordSignInAsync(string email, string password, bool isPersistent, bool lockoutOnFailure);
     }
 }

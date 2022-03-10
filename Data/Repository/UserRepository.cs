@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Data.IFactory;
 using Data.IRepository;
+using Shared.Common.Enums;
 using Shared.Models.Identity;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,12 @@ namespace Data.Repository
 {
     public class UserRepository: IUserRepository
     {
-        private readonly string selectUserQuery = @"SELECT * FROM dbo.Users";
+        private readonly string selectUserQuery = @"SELECT * FROM dbo.[User]";
 
 
         private readonly IDbConnectionFactory _dbConnection;
+
+
 
         public UserRepository(IDbConnectionFactory dbConnection)
         {
@@ -54,6 +57,32 @@ namespace Data.Repository
                 user = users.ToList().FirstOrDefault();
             }
             return user;
+        }
+
+        public async Task<SignInResult> PasswordSignInAsync(string email, string password, bool isPersistent, bool lockoutOnFailure)
+        {
+            string Query = selectUserQuery + @" WHERE Email = @Email and PasswordHash=@Password";
+
+            SignInResult result=new();
+            using (IDbConnection connection = _dbConnection.CreateDBConnection())
+            {
+                var users = await connection.QueryAsync<User>(
+                    Query, new
+                    {
+                        Email = email
+                    }, commandType: CommandType.Text);
+
+                if(users.FirstOrDefault()!=null && users.FirstOrDefault().Id>0 )
+                {
+                    result.Succeeded = true;
+                }
+                else
+                {
+                    result.Succeeded = false;
+                    result.Message = ResponseMsg.IncorrectUserLogin.ToString();
+                }
+            }
+            return result;
         }
     }
 }

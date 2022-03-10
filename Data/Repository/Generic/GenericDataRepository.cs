@@ -1,26 +1,38 @@
-﻿using Data.IRepository;
-using Data.IRepository.IGeneric;
-using Shared.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Data;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
+using Dapper;
+using DapperExtensions;
+using Data.IFactory;
+using Data.IRepository.IGeneric;
 
 namespace Data.Repository.GenericRepository
 {
     public class GenericDataRepository<T> : IGenericDataRepository<T>, IDisposable where T : class
     {
-        public GenericDataRepository()
+        //public GenericDataRepository()
+        //{
+        //}
+
+        #region properties
+        private readonly IDbConnectionFactory dBConnection;
+
+        #endregion
+
+        #region constructor 
+        public GenericDataRepository(IDbConnectionFactory connectionFactory)
         {
+            dBConnection = connectionFactory;
         }
+        #endregion
+
         public bool Add(params T[] items)
         {
             throw new NotImplementedException();
         }
-       
+
         public bool Remove(params T[] items)
         {
             throw new NotImplementedException();
@@ -63,7 +75,7 @@ namespace Data.Repository.GenericRepository
             return item;
         }
 
-       
+
         public void Dispose()
         {
             //IDisposable disposable = this as IDisposable;
@@ -75,6 +87,144 @@ namespace Data.Repository.GenericRepository
         {
             throw new NotImplementedException();
         }
+
+        #region Added By Sharad
+
+
+
+        public void Insert(T obj)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            connection.Insert(obj);
+        }
+        public async Task InsertAsync(T obj)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            await connection.InsertAsync(obj);
+        }
+        public void InsertAll(ICollection<T> obj)
+        {
+
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            connection.Insert(obj);
+        }
+
+        public async Task InsertAllAsync(ICollection<T> obj)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            await connection.InsertAsync(obj);
+        }
+
+        public T InsertWithReturnId(T obj)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            connection.Insert(obj);
+            return obj;
+        }
+
+        public async Task<T> InsertWithReturnIdAsync(T obj)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            await connection.InsertAsync(obj);
+            return obj;
+        }
+        public void Update(T obj)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            connection.Update(obj);
+        }
+        public async Task UpdateAsync(T obj)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            await connection.UpdateAsync(obj);
+        }
+
+        public void UpdateAll(List<T> entities)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            connection.Update(entities);
+        }
+
+        public async Task UpdateAllAsync(List<T> entities)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            await connection.UpdateAsync(entities);
+        }
+
+        public void RemoveAll(List<T> entities)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            connection.Delete(entities);
+        }
+
+
+        public void Delete(T entity)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            connection.Delete(entity);
+        }
+
+        public async Task DeleteAsync(T entity)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            await connection.DeleteAsync(entity);
+        }
+
+        public void DeleteById(object id)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            var entity = connection.Get<T>(id);
+            connection.Delete(entity);
+
+        }
+
+        public async Task DeleteByIdAsync(object id)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            var entity = await connection.GetAsync<T>(id);
+            await connection.DeleteAsync(entity);
+
+        }
+        public virtual void DeleteAll(List<T> entityCollection)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            connection.Delete(entityCollection);
+        }
+
+        public T GetById(object id)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            return connection.Get<T>(id);
+        }
+
+        public async Task<T> GetByIdAsync(object id)
+        {
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            return await connection.GetAsync<T>(id);
+        }
+
+
+
+
+        public bool ExecuteSqlCommand(string query, object param)
+        {
+            bool status;
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            connection.Execute(query, param, commandType: CommandType.Text);
+            status = true;
+            return status;
+        }
+
+        public async Task<bool> ExecuteSqlCommandAsync(string query, object param)
+        {
+            bool status;
+            using IDbConnection connection = dBConnection.CreateDBConnection();
+            await connection.ExecuteAsync(query, param, commandType: CommandType.Text);
+            status = true;
+            return status;
+        }
+
+        #endregion
     }
 
     public class BaseEntity

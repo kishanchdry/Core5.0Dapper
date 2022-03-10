@@ -11,16 +11,20 @@ using System.Threading.Tasks;
 using Shared.Models.Identity;
 using Data.IRepository;
 using Services.IServices.Identity;
+using Services.Generic;
+using Data.IRepository.IGeneric;
+using AutoMapper;
+using Shared.Properties;
 
 namespace Services.Services.Identity
 {
-    public class UserService : IUserService, IDisposable
+    public class UserService : GenericService<User, User>, IUserService, IDisposable
     {
+        
         private readonly IUserRepository userRepository;
 
         public IQueryable<User> Users => throw new NotImplementedException();
-
-        public UserService(IUserRepository _userRepository)
+        public UserService(IUserRepository _userRepository,IGenericDataRepository<User> repository, IMapper mapper) : base(repository, mapper)
         {
             userRepository = _userRepository;
         }
@@ -55,14 +59,22 @@ namespace Services.Services.Identity
             throw new NotImplementedException();
         }
 
-        public Task<CustomIdentityResult> CreateAsync(User user)
+        public async Task<CustomIdentityResult> CreateAsync(User user)
         {
-            throw new NotImplementedException();
-        }
+            CustomIdentityResult customIdentityResult = new();
+            var result=await repository.InsertWithReturnIdAsync(user);
 
-        public Task<CustomIdentityResult> CreateAsync(User user, string password)
-        {
-            throw new NotImplementedException();
+            if(result!=null && result.Id>0)
+            {
+                customIdentityResult.Succeeded = true;
+                customIdentityResult.Message = "Error occured";
+            }
+            else
+            {
+                customIdentityResult.Succeeded = false;
+                customIdentityResult.Message = Resources.EmailNotVerified;
+            }
+            return customIdentityResult;
         }
 
         public Task<CustomIdentityResult> DeleteAsync(User user)

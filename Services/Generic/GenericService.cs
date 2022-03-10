@@ -17,6 +17,7 @@ namespace Services.Generic
         protected readonly IGenericDataRepository<E> repository;
         protected readonly IMapper mapper;
 
+
         public GenericService(IGenericDataRepository<E> repository, IMapper mapper)
         {
             this.repository = repository;

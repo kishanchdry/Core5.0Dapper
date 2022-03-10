@@ -53,6 +53,7 @@ namespace Web.Authorization.Policies
         /// <returns></returns>
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, CustomRequirePolicy requirement)
         {
+            context.User
             //List<string> s = new List<string>() { "_EditUser" };
             //connectedAction.Add("EditUser", s);
 

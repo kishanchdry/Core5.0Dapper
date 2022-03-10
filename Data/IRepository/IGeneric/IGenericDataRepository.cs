@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Shared.Models.Identity;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Data.IRepository.IGeneric
@@ -19,5 +18,29 @@ namespace Data.IRepository.IGeneric
         bool Remove(long Id);
         bool ChangeStatus(long id);
         IList<T> GetAllWitnInActive();
+
+        #region Added By Sharad
+        void Insert(T obj);
+        Task InsertAsync(T obj);
+        void InsertAll(ICollection<T> obj);
+        Task InsertAllAsync(ICollection<T> obj);
+        T InsertWithReturnId(T obj);
+        Task<T> InsertWithReturnIdAsync(T obj);
+        void Update(T obj);
+        Task UpdateAsync(T obj);
+        void UpdateAll(List<T> entities);
+        Task UpdateAllAsync(List<T> entities);
+        void RemoveAll(List<T> entities);
+        void Delete(T entity);
+        Task DeleteAsync(T entity);
+        void DeleteById(object id);
+        Task DeleteByIdAsync(object id);
+        void DeleteAll(List<T> entityCollection);
+        T GetById(object id);
+        Task<T> GetByIdAsync(object id);
+        bool ExecuteSqlCommand(string query, object param);
+        Task<bool> ExecuteSqlCommandAsync(string query, object param);
+
+        #endregion
     }
 }
