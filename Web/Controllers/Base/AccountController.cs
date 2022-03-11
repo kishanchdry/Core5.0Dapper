@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Shared.Models.API;
 using Services.Services;
 using Shared.Models.Identity;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Web.Controllers.Base
 {
@@ -79,12 +80,26 @@ namespace Web.Controllers.Base
 
                 if (result.Succeeded)
                 {
+
+
+                    var claims = new List<Claim>()
+                        {
+                            new Claim(ClaimTypes.Name, result.User.UserName),
+                            new Claim(ClaimTypes.Email, result.User.Email),
+                            new Claim(ClaimTypes.NameIdentifier, result.User.Id.ToString())
+                        };
+                    var Defaultidentity = new ClaimsIdentity(claims, "Default Identity");
+                    var claimPric = new ClaimsPrincipal(new[] { Defaultidentity });
+
+
+                    await HttpContext.SignInAsync(claimPric);
+                    //HttpContext.User = claimPric;
+
                     // Get the roles for the user
                     if (loginViewModel.ReturnUrl != null && !string.IsNullOrWhiteSpace(loginViewModel.ReturnUrl))
                     {
                         return Redirect(loginViewModel.ReturnUrl);
                     }
-
 
                     if (await _userManager.IsInRoleAsync(user.Id, "Guest"))
                     {
@@ -142,11 +157,7 @@ namespace Web.Controllers.Base
                 UserName = registerViewModel.UserName,
                 Email = registerViewModel.Email,
                 FirstName = registerViewModel.Name,
-                PasswordHash= registerViewModel.Password
-                FirstName = registerViewModel.FirstName,
-                LastName = registerViewModel.LastName,
-                PhoneNumber = registerViewModel.PhoneNumber,
-                TwoFactorEnabled = registerViewModel.TwoFactorEnabled,
+                PasswordHash = registerViewModel.Password
             };
             //TODO handle error where register or add user but not expand that before insert
             var result = await _userManager.CreateAsync(user);

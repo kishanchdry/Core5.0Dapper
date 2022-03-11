@@ -18,7 +18,7 @@ namespace Services.Services.Identity
     public class SignInService : GenericService<User, User>, ISignInService, IDisposable
     {
         private readonly IUserRepository userRepository;
-        public SignInService(IUserRepository _userRepository,IGenericDataRepository<User> repository, IMapper mapper) : base(repository, mapper)
+        public SignInService(IUserRepository _userRepository, IGenericDataRepository<User> repository, IMapper mapper) : base(repository, mapper)
         {
             userRepository = _userRepository;
         }
@@ -27,9 +27,9 @@ namespace Services.Services.Identity
             return principal.Claims.Count() > 0;
         }
 
-        public Task<SignInResult> PasswordSignInAsync(string Email, string password, bool isPersistent, bool lockoutOnFailure)
+        public async Task<SignInResult> PasswordSignInAsync(string Email, string password, bool isPersistent, bool lockoutOnFailure)
         {
-            return userRepository.PasswordSignInAsync(Email, password, isPersistent, lockoutOnFailure);
+            return await userRepository.PasswordSignInAsync(Email, password, isPersistent, lockoutOnFailure);
         }
 
         public Task SignInAsync(User user, bool isPersistent, string authenticationMethod = null)

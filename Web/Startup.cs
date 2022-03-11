@@ -86,6 +86,11 @@ namespace Web
             #endregion
 
             #region Identity
+            services.AddAuthentication("CookiesAuth").AddCookie("CookiesAuth", config =>
+            {
+                config.Cookie.Name = "Identitye.Cookie";
+                config.LoginPath = "/Home/Index";
+            });
             //AddIdentity register the services
             //services.AddIdentity<User, Role>(options =>
             //{
@@ -109,13 +114,13 @@ namespace Web
             //    AddEntityFrameworkStores<AppIdentityContext>().
             //    AddDefaultTokenProviders();
 
-            
-            services.AddAuthentication()
-                .AddGoogle(option =>
-                {
-                    option.ClientId = "620481322673-mmm3d49qha1ie4qv0fmb9cf8dj46fv37.apps.googleusercontent.com";
-                    option.ClientSecret = "2YrLPLxsh5o6R0paavYT8fbl";
-                });
+
+            //services.AddAuthentication()
+            //    .AddGoogle(option =>
+            //    {
+            //        option.ClientId = "620481322673-mmm3d49qha1ie4qv0fmb9cf8dj46fv37.apps.googleusercontent.com";
+            //        option.ClientSecret = "2YrLPLxsh5o6R0paavYT8fbl";
+            //    });
             #endregion
 
             #region Cookies

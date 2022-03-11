@@ -69,12 +69,14 @@ namespace Data.Repository
                 var users = await connection.QueryAsync<User>(
                     Query, new
                     {
-                        Email = email
+                        Email = email,
+                        Password=password
                     }, commandType: CommandType.Text);
 
                 if(users.FirstOrDefault()!=null && users.FirstOrDefault().Id>0 )
                 {
                     result.Succeeded = true;
+                    result.User = users.FirstOrDefault();
                 }
                 else
                 {

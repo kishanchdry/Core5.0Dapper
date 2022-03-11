@@ -248,7 +248,7 @@ namespace Services.Services.Identity
 
         public Task<bool> IsInRoleAsync(long user, string role)
         {
-            throw new NotImplementedException();
+            return Task.Run(()=> { return true; });
         }
 
         public Task<CustomIdentityResult> ResetPasswordAsync(long user, string token, string newPassword)
